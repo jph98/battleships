@@ -1,4 +1,7 @@
 --- 
+board_height: 8
+board_width: 8
+
 players: 
   "Player 1":
     name: Jon
