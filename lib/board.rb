@@ -1,7 +1,7 @@
 class Board
 
-	def initialize(ships)
-		@ships = ships
+	def initialize()
+		
 	end
 
 end

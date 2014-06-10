@@ -1,12 +1,18 @@
+require_relative "board"
+require_relative "ship"
+
 class Player
 
-	:HUMAN = "human"
-	:COMPUTER = "computer"
+	HUMAN = :HUMAN
+	COMPUTER = :COMPUTER
 
 	attr_accessor :name, :board
 
-	def initialize(name)
+	def initialize(name, type, ships)
 		@name = name
+		@type = type
+		@ships = ships
+		
 		@board = Board.new()
 	end
 

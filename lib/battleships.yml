@@ -1,25 +1,30 @@
 --- 
 players: 
-  "player 1"
-    - name: Jon
-    - type: HUMAN
-  "player 2"
-    - name: Dave
-    - type: COMPUTER
+  "Player 1":
+    name: Jon
+    type: HUMAN
+  "Player 2":
+    name: Dave
+    type: COMPUTER
 
 ships:
-  "aircraftcarrier"
-    - number: 1
-    - size: 5
-  "battleship"
-    - number: 1
-    - size: 4
-  "submarine"
-    - number: 1
-    - size: 3
-  "destroyer"
-    - number: 1
-    - size: 3
-  "patrolboat"
-    - number: 1
-    - size: 3
+  "Aircraft Carrier":
+    name: "aircraftcarrier"
+    number: 1
+    size: 5
+  "Battleship":
+    name: "battleship"
+    number: 1
+    size: 4
+  "Submarine":
+    name: "submarine"
+    number: 1
+    size: 3
+  "Destroyer":
+    name: "destroyer"
+    number: 1
+    size: 3
+  "Patrol Boat":
+    name: "patrolboat"
+    number: 1
+    size: 3    

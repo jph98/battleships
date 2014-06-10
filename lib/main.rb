@@ -4,4 +4,5 @@ require_relative "game"
 
 puts "Usage: #{$0} <mode>"
 
-Game.new()
+game = Game.new()
+game.start()
