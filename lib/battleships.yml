@@ -1,0 +1,25 @@
+--- 
+players: 
+  "player 1"
+    - name: Jon
+    - type: HUMAN
+  "player 2"
+    - name: Dave
+    - type: COMPUTER
+
+ships:
+  "aircraftcarrier"
+    - number: 1
+    - size: 5
+  "battleship"
+    - number: 1
+    - size: 4
+  "submarine"
+    - number: 1
+    - size: 3
+  "destroyer"
+    - number: 1
+    - size: 3
+  "patrolboat"
+    - number: 1
+    - size: 3

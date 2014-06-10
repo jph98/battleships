@@ -1,0 +1,10 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    text-table (1.2.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  text-table
