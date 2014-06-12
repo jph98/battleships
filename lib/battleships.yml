@@ -1,6 +1,6 @@
 --- 
-board_height: 8
-board_width: 8
+board_height: 16
+board_width: 16
 
 players: 
   "Player 1":

@@ -8,10 +8,11 @@ class Ship
 		@size = size
 	end
 
-	def update(tiles)
+	def update(tiles, state)
 		
+		# TODO: We could use the name of the boat as the display
 		tiles.each do |t|
-			t.state = Tile::OCCUPIED
+			t.state = state
 		end
 	end
 

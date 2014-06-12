@@ -1,7 +1,8 @@
 class Tile
 
 	EMPTY = :EMPTY
-	OCCUPIED = :OCCUPIED
+	H_OCCUPIED = :H_OCCUPIED
+	V_OCCUPIED = :V_OCCUPIED
 	DESTROYED = :DESTROYED
 
 	attr_accessor :state
@@ -10,16 +11,22 @@ class Tile
 		@state = state
 	end
 
+	def short_state()
+		
+	end
+
 	def display()
 
 		case @state
 
 		when EMPTY
-			return "_"
-		when OCCUPIED
-			return "*"
+			return " "
+		when H_OCCUPIED
+			return "H"
+		when V_OCCUPIED
+			return "V"
 		when DESTROYED
-			return "x" 
+			return "*" 
 		else
 			raise "Tile state unknown"
 		end
