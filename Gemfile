@@ -1,3 +1,4 @@
 source 'https://rubygems.org' 
 
-gem "text-table"
+gem "sinatra"
+gem "shotgun"

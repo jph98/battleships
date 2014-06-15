@@ -10,14 +10,21 @@ class Ship
 
 	def update(tiles, state)
 		
-		# TODO: We could use the name of the boat as the display
 		tiles.each do |t|
 			t.state = state
 		end
 	end
 
 	def is_sunk
-		# Determines whether this is sunk or not
+		
+		sunk = true
+		tiles.each do |t|
+			if t.state != DESTROYED
+				sunk = false
+				break
+			end
+		end
+		return sunk
 	end
 
 end

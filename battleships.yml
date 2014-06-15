@@ -1,6 +1,6 @@
 --- 
-board_height: 16
-board_width: 16
+board_height: 10
+board_width: 10
 
 players: 
   "Player 1":
@@ -30,4 +30,4 @@ ships:
   "Patrol Boat":
     name: "patrolboat"
     number: 1
-    size: 3    
+    size: 2    

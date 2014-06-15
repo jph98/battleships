@@ -11,10 +11,6 @@ class Tile
 		@state = state
 	end
 
-	def short_state()
-		
-	end
-
 	def display()
 
 		case @state
@@ -26,10 +22,14 @@ class Tile
 		when V_OCCUPIED
 			return "V"
 		when DESTROYED
-			return "*" 
+			return "D" 
 		else
 			raise "Tile state unknown"
 		end
+	end
+
+	def to_s()
+		return display()
 	end
 
 end

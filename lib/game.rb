@@ -2,12 +2,27 @@ require "yaml"
 
 require_relative "player"
 
+#
+# Provides an entry point and a container for players
+#
 class Game
+
+	attr_accessor :id, :state, :height, :width
+
+	PLAYING = "playing"
+	GAMEOVER = "gameover"
+
+	attr_accessor :players
 
 	def initialize()
 
 		config = YAML::load(File.open("battleships.yml"))
 		load_players(config)
+		@id = SecureRandom.uuid
+		puts "Generated gameid: #{id}"
+		@state = Game::PLAYING
+		@height = config["board_height"]
+		@width = config["board_width"]
 	end
 
 	def load_players(config) 		
@@ -16,7 +31,6 @@ class Game
 		@players = []
 		config["players"].each_value do |p|
 			puts "\tFound player: #{p}"
-			 
 			player = Player.new(p["name"], p["type"])
 			@players << player
 		end		
@@ -24,23 +38,20 @@ class Game
 		raise "Cannot create a game for less than 2 players" if @players.size < 2		
 	end
 
-	def start()
+	def get_players()
 		
-		puts "\nStarting game..."
+		# Yuck, but we need to provide a game loop outside here
+		return @players
+	end
+
+	def over()
 
 		@players.each do |p|
-			puts "\nPlayer #{p.name}'s turn...\n\n"
-
-			# Display the other players board
-			p.display_board()
-			
-			print "\nEnter co-ordinates to attaaackkk: "
-			coord = gets.chomp
-			unless coord.empty?
-				p.fire_shot(coord)
+			if !p.has_ships_that_are_intact
+				return false
 			end
-			
-		end				
+		end
+		return true
 	end
 
 end

@@ -2,12 +2,14 @@ require_relative "tile"
 
 class Board
 
+	attr_accessor :rows
+	
 	def initialize(height, width)
 
 		@height = height
 		@width = width
 
-		puts "Building board, height: #{height}, width: #{width}"
+		puts "Building board, height: #{height}, width: #{width}"  if DEBUG
 
 		# Build a hash of index -> tile_list
 		@rows = {}
@@ -23,52 +25,65 @@ class Board
 
 	def layout(ships)
 
-		puts "Laying out ships"
-
 		num_vertical = ships.size / 2
 		num_horizontal = ships.size - num_vertical
 
-		puts "\nPlacing #{num_vertical} vertical ships and #{num_horizontal} horizontal ships\n\n"
-		
-		# TODO: Handle failure
-		max_attempts = 3
+		puts "\nPlacing #{num_vertical} vertical ships and #{num_horizontal} horizontal ships\n\n" if DEBUG
+	
 
 		(1..num_vertical).each do |n|
 
 			s = ships.first
+			placed = false
+			attempt_num = 0
+			max_attempts = 3
 
-			puts s.name + " x " + s.number.to_s + ", size: " + s.size.to_s
+			puts s.name + " x " + s.number.to_s + ", size: " + s.size.to_s if DEBUG
 
 			# Get size and calculate min and max start pos
-			if place_ship_vertical(s)
-				puts "\tValid for ship"
-				ships.shift
-			else
-				puts "Could not place ship #{s.name}"
-				exit
+			while attempt_num < max_attempts
+				if not placed
+					if place_ship_vertical(s)
+						ships.shift
+						placed = true
+					end
+					attempt_num += 1
+				else
+					break
+				end
 			end
 		end
 
 		(1..num_horizontal).each do |n|
 
 			s = ships.first
+			placed = false
+			attempt_num = 0
+			max_attempts = 3
 
-			puts s.name + " x " + s.number.to_s + ", size: " + s.size.to_s
+			puts s.name + " x " + s.number.to_s + ", size: " + s.size.to_s if DEBUG
 
 			# Get size and calculate min and max start pos			
-			if place_ship_horizontal(s)
-				puts "\tValid for ship"
-				ships.shift
-			else				
-				puts "Could not place ship #{s.name}"
-				exit
+			while attempt_num < max_attempts
+				if not placed
+					if place_ship_horizontal(s)
+						puts "\tValid for ship" if DEBUG
+						ships.shift
+						placed = true
+					else 
+						puts "Could not place ship"
+					end
+				else
+					break
+				end
 			end
 		end
 
-		puts "Placed ships, size after placement #{ships.size}"
-		# if ships.size > 0
-		# 	raise "Could not place all the ships"
-		# end
+		puts "Placed ships, size after placement #{ships.size}" if DEBUG
+		if ships.size > 0
+		 	raise "Could not place all the ships" if DEBUG
+		 	exit
+		end
 	end
 
 	def place_ship_vertical(s)
@@ -78,7 +93,6 @@ class Board
 		v_start_pos = rand(min..max)
 		v_end_pos = v_start_pos + (s.size - 1)
 
-		puts "#{v_start_pos} #{v_end_pos}"
 		h_pos = rand(1..@width)
 
 		tile_places = []
@@ -94,13 +108,12 @@ class Board
 			end
 		end	
 
-		puts "Placing ship vertically at: row: #{v_start_pos}, col: #{h_pos}"
+		puts "Placing ship vertically at: row: #{v_start_pos}, col: #{h_pos}" if DEBUG
 		begin
 			tiles = vert_valid_for_ship(tile_places, v_start_pos, v_end_pos)			
 			s.update(tiles, Tile::V_OCCUPIED)
 			return true
 		rescue
-			puts "Problem"
 			return false
 		end	
 	end
@@ -116,7 +129,7 @@ class Board
 		v_pos = rand(1..@height)
 		tile_places = @rows[v_pos]
 
-		puts "Placing ship horizontally at: row: #{v_pos}, col: #{h_start_pos}"
+		puts "Placing ship horizontally at: row: #{v_pos}, col: #{h_start_pos}" if DEBUG
 		begin
 			tiles = horz_valid_for_ship(tile_places, h_start_pos, h_end_pos)
 			s.update(tiles, Tile::H_OCCUPIED)
@@ -131,13 +144,13 @@ class Board
 
 		tiles = []
 
-		puts "Checking from #{start_pos} to #{end_pos}"
+		puts "Checking from #{start_pos} to #{end_pos}" if DEBUG
 
 		# Check tiles			
 		tile_places.each do |tile|			
-			puts "Tile: [#{tile.state()}]"
+			puts "Tile: [#{tile.state()}]" if DEBUG
 			unless tile.state == Tile::EMPTY				
-				raise "Could not place ship"
+				raise "Could not place ship because tile is #{tile.state}" 
 			else
 				tiles << tile
 			end
@@ -151,9 +164,8 @@ class Board
 		(start_pos..end_pos).each do |c|
 			# Check tiles
 			tile = tile_places[c]
-			print "#{tile.short_state()} "
 			unless tile.state == Tile::EMPTY
-				raise "Could not place ship"
+				raise "Could not place ship because tile is #{tile.state}"
 			else
 				tiles << tile
 			end
@@ -163,10 +175,39 @@ class Board
 
 	def update(coordinate)
 
-		puts "Checking coordinate: #{coordinate}..."
+		puts "Checking coordinate: #{coordinate}..." 
 	end
 
-	def validate
+	def fire(coords)
+
+		if (coords.size != 2)
+			puts "Please enter valid coordinates"
+			return false
+		end
+
+		c = coords.split("")
+		row_num = c[0].ord() - 64
+		col_num = c[1].to_i
+
+		if row_num < 0 or row_num > @height
+			puts "Row specified #{row_num} is not within range, please re-enter"
+			return false
+		end
+
+		if col_num < 0 or col_num > @width
+			puts "Column specified #{col_num} is not within range, please re-enter"
+			return false
+		end
+
+		# Mark as hit if specified
+		tile_list = @rows[row_num]
+		tile = tile_list[col_num - 1]
+
+		if tile.state == Tile::H_OCCUPIED or tile.state == Tile::V_OCCUPIED
+			puts "Kabooom, player hit ship: #{tile.state}"
+			tile.state = Tile::DESTROYED
+		end
+
 		return true
 	end
 

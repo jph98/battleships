@@ -12,7 +12,8 @@ class Player
 
 		@name = name
 		@type = type
-		
+		@ships = []
+
 		layout_board()
 	end
 
@@ -21,8 +22,12 @@ class Player
 		config = YAML::load(File.open("battleships.yml"))
 		@board = Board.new(config["board_height"], config["board_width"])		
 
-		ships = load_ships(config)
-		board.layout(ships)
+		@ships = load_ships(config)
+		board.layout(@ships)
+	end
+
+	def get_board()
+		return @board
 	end
 
 	def load_ships(config)
@@ -43,13 +48,23 @@ class Player
 		@board.display()
 	end
 
-	def fire_shot(coordinate)
+	def fire_shot(coords)
 
-		if !@board.validate(coordinate)
-			raise "Not a valid coordinate"
-		end
+		return @board.validate(coords)
+	end
 
-		@board.update(coordinate)
+	def has_ships_that_are_intact
+
+		all_ships_sunk = true
+
+		@ships.each do |s|
+
+			if !s.is_sunk
+				all_ships_sunk = false
+			end
+
+		end	
+		return all_ships_sunk
 	end
 
 end

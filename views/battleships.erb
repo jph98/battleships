@@ -1,0 +1,108 @@
+<div class="container"> 
+
+	<h1>Battleships</h1>
+	<div id="playercontrols">
+		<form action="/attack" method="post">
+			Coordinates: <input type="text" name="coordinates"></input> <input type="submit" value="Fire">
+		</form>
+	</div>
+
+	<div id="board">
+		 <canvas id="maincanvas" width="900" height="500"></canvas>
+	</div>
+
+	<% if @error.nil? %>			
+		Game state: <%= session['gamestate'] %><br>
+		Current player number: <%= session['current_player_number'] + 1 %><br>
+		Game ID: <%= session['gameid'] %>
+
+		<script type="text/javascript">
+
+			var random_sea = ['#006699', '#006994', '#008294', '#005d94', '#007594'];
+			var tile_width = 50;
+			var tile_height = 50;
+
+			function drawtile(tile_x, tile_y, state) {
+
+				var tilesheet = new sheetengine.BaseSheet({x:tile_x, y:tile_y, z:0}, 
+												     {alphaD:90, betaD:0, gammaD:0}, 
+													 {w:tile_width, h:tile_height});
+
+				switch(state) {
+					case "V":
+						tilesheet.color = '#303030';
+						break;
+					case "H":
+						tilesheet.color = '#303030';
+						break;
+					case "D":
+						tilesheet.color = '#FFCC00';
+						break;
+					default:
+
+						var num = Math.floor(Math.random() * random_sea.length)
+						tilesheet.color = random_sea[num];
+						break;
+				}
+			}
+
+			function drawrow(y, coldata) {
+
+				console.log(coldata.length)
+				var num = coldata.length;
+				var x = -120;
+
+				// Draw bottom (left -> right)
+				for (var n = 0; n < num; n++) {
+
+					drawtile(x, y, coldata[n]);
+					x += tile_height + 1;
+				}
+			}			
+
+
+			$(document).ready(function() {
+
+				var canvasElement = document.getElementById('maincanvas');
+				sheetengine.scene.init(canvasElement, {w:1100,h:800});
+
+				$.getJSON("/board/<%= session['gameid'] %>/player/<%= session['current_player_number'] %>", 
+
+					function(rowdata) {
+
+						var y = -250;
+
+						var size = rowdata["size"] + 1;
+
+						for (var i = 1;  i < size; i++) {
+
+							var coldata = rowdata[i]; 
+							drawrow(y, coldata);
+							y+= tile_width + 1;
+						}
+
+						sheetengine.calc.calculateAllSheets();
+						sheetengine.drawing.drawScene(true);
+
+						var sheet = new sheetengine.Sheet({x:-120,y:-250,z:0}, 
+														  {alphaD:0,betaD:0,gammaD:0}, 
+														  {w:50,h:50});
+						var img = new Image();
+						img.onload = function() {
+							sheet.context.drawImage(img, 0,0);
+
+							sheetengine.calc.calculateChangedSheets();
+							sheetengine.drawing.drawScene(true);
+						};
+
+						img.src = 'images/grass.png'; 
+						
+					}
+				);
+			});
+
+		</script>
+
+	<% end %>
+
+</div>
