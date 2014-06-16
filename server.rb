@@ -47,6 +47,21 @@ error do
   	"Application error"
 end
 
+def initialise_player_board(game, player_number) 
+
+    session['current_player_number'] = player_number
+    session['gamestate'] = game.state
+    session['gameid'] = game.id
+    session['height'] = game.height
+    session['width'] = game.width
+
+    puts "Players: #{game.players.size()}"
+
+    player = game.players[player_number]
+    puts "\nPlayer #{player.name}'s turn... board is:\n\n"
+    player.display_board()
+end
+
 def create_new_game(id, server_games)
 
     puts "\n\n* Setting up new game, gameid does not exist: #{id}"
@@ -55,22 +70,12 @@ def create_new_game(id, server_games)
     initial_player_number = 0
     player = game.players[initial_player_number]
     board = player.get_board()
-
-    session['current_player_number'] = initial_player_number
-    session['gamestate'] = game.state
-    session['gameid'] = game.id
-    session['height'] = game.height
-    session['width'] = game.width
-
-    puts "Added new game: #{game.id}, size: #{settings.server_games.size()}"
-    puts "Players: #{game.players.size()}"
+    initialise_player_board(game, initial_player_number)
 
     # Save the board in the global server_games context
     settings.server_games[game.id] = game
+    puts "Added new game: #{game.id}, size: #{settings.server_games.size()}"
 
-    player = game.players[initial_player_number]
-    puts "\nPlayer #{player.name}'s turn... board is:\n\n"
-    player.display_board()
 end
 
 ##################################################
@@ -137,25 +142,8 @@ get "/" do
         game = settings.server_games[id]
         puts "Found Game: #{game.id} in state #{game.state} for players: #{game.players.size()}"
 
-        # unless session['gamestate'].eql? Game::GAMEOVER
-    
-        #     # Get the index of the current player, swap
-        #     num = session['current_player_number']
-        #     other_player_number = alternate_player(num)
-        #     puts "current_player_number: #{other_player_number}"
-        #     player = game.players[other_player_number]
-        #     session['current_player_number'] = other_player_number
-
-        #     # Display the opposite players board
-            
-        #     puts "currentplayer: #{other_player_number}, otherplayer: #{other_player_number}"
-        #     puts "\nPlayer #{player.name}'s turn... board is:\n\n"
-        #     player.display_board()
-
-        # else
-        #     puts "Game over"
-        #     session['gamestate'] = Game::GAMEOVER
-        # end
+        player_number = session["current_player_number"]
+        initialise_player_board(game, player_number)
 
         erb :battleships
     end
@@ -175,15 +163,14 @@ get "/board/:gameid/player/:playernum" do
     puts "displaying board for other player: #{other_player_number}"
     player = game.players[other_player_number]
 
-    rows = player.board().rows()
-    rows["size"] = rows.size()
+    #rows = player.board().rows()    
 
-    puts "Size #{rows['size']}"
+    # This causes an issue when displaying the board a second time
+    # rows["size"] = rows.size()
+    # puts "Size #{rows['size']}"
 
-    json_board = rows.to_json()
+    json_board = player.board().to_json
     puts "Board: #{json_board}"
-
-    json_board
 
     return json_board
 end
