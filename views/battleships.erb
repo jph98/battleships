@@ -12,6 +12,7 @@
 		Current player number: <%= session['current_player_number'] + 1 %><br>
 		Game ID: <%= session['gameid'] %>
 
+		<br><b>Players Board</b>
 		<script type="text/javascript">
 
 			var WIDTH = 1000;
@@ -23,9 +24,10 @@
 			document.body.appendChild(renderer.view);
 			var loader = new PIXI.AssetLoader(['tiles.json']);
 
-			var ship = isoTile('road.png');
+			var vert = isoTile('roadEW.png');
+			var horz = isoTile('roadNS.png');
 			var water = isoTile('water.png');
-			var tiles = [ship, water];
+			var tiles = [vert, horz, water];
 
 			var tileWidth = 50;
 			var tileHeight = 50;
@@ -63,12 +65,12 @@
                 			}
 
 							if (tileType == "H") {
-								drawTile = tiles[0];                				
+								drawTile = tiles[1];                				
 								drawTile(isoX + xOffset, isoY + yOffset);
                 			}                			
 
 			            } else {
-			            	drawTile = tiles[1];                				
+			            	drawTile = tiles[2];                				
 							drawTile(isoX + xOffset, isoY + yOffset);
 			            }
 
