@@ -238,4 +238,13 @@ class Board
 		return letter_idx.chr()
 	end
 
+	def to_json()
+		
+		json_text = {}
+		json_text["size"] = @rows.size
+		json_text["rows"] = @rows
+
+		return json_text.to_json
+	end
+
 end
