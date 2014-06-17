@@ -189,6 +189,8 @@ class Board
 		row_num = c[0].ord() - 64
 		col_num = c[1].to_i
 
+		puts "Row #{row_num} and col #{col_num}"
+
 		if row_num < 0 or row_num > @height
 			puts "Row specified #{row_num} is not within range, please re-enter"
 			return false
@@ -199,16 +201,10 @@ class Board
 			return false
 		end
 
-		# Mark as hit if specified
 		tile_list = @rows[row_num]
+		puts "Tile list #{tile_list}"
 		tile = tile_list[col_num - 1]
 
-		if tile.state == Tile::H_OCCUPIED or tile.state == Tile::V_OCCUPIED
-			puts "Kabooom, player hit ship: #{tile.state}"
-			tile.state = Tile::DESTROYED
-		end
-
-		return true
 	end
 
 	def display()

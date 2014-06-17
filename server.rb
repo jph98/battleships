@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require "sinatra"
+require "sinatra/flash"
 require "json"
 
 require_relative "lib/game.rb"
@@ -97,6 +98,7 @@ end
 
 post "/attack" do
 
+    @messages = []
     id = session['gameid']
     server_games = settings.server_games
     game = server_games[id]
@@ -105,16 +107,32 @@ post "/attack" do
     board = other_player.get_board()
 
     coords = params[:coords]
+
+    puts "\nATTACK from player: #{current_player_number} for space: #{coords}\n"
+
     unless coords.nil?
 
-        if (board.fire(coords))
+        tile = board.fire(coords)
+        puts "Tile state is #{tile}"
 
-            puts "Destroyed coordinates: #{coords}"
-        else
-            puts "Missed"
+        if tile.state == Tile::H_OCCUPIED or tile.state == Tile::V_OCCUPIED
+
+            tile.state = Tile::DESTROYED
+            puts "Tile state #{tile.state}"
+
+            ship_destroyed = other_player.ship_destroyed(tile)
+        
+            unless ship_destroyed.nil?
+                @messages << "Kabooom, player destroyed ship - #{ship_destroyed.name}"
+            else
+                @messages << "Player hit part of ship"
+            end
+        else 
+            @messages << "Missed"
         end
+
     else
-        puts "Must enter coordinates"
+        @messages << "Must enter coordinates"
     end
 
     other_player.display_board()
@@ -163,14 +181,5 @@ get "/board/:gameid/player/:playernum" do
     puts "displaying board for other player: #{other_player_number}"
     player = game.players[other_player_number]
 
-    #rows = player.board().rows()    
-
-    # This causes an issue when displaying the board a second time
-    # rows["size"] = rows.size()
-    # puts "Size #{rows['size']}"
-
-    json_board = player.board().to_json
-    puts "Board: #{json_board}"
-
-    return json_board
+    return player.board().to_json
 end

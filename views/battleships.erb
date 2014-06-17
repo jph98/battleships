@@ -1,18 +1,31 @@
 <div class="container"> 
 
-	<h1>Battleships</h1>
-	<div id="playercontrols">
-		<form action="/attack" method="post">
-			Coordinates: <input type="text" name="coordinates"></input> <input type="submit" value="Fire">
-		</form>
+	<a href="/"><img src="logo.png"></a><span>Player <%= session['current_player_number'] + 1 %></span> 
+
+	<div id="messages">
+		<% unless @messages.nil? %>
+			<% @messages.each do |m| %>
+				<p class="text-warning"><%= m %></p>
+			<% end %>
+		<% end %>
+	</div>
+
+	<form action="/attack" method="post" class="form-horizontal">
+		<div id="playercontrols" class="form-group">
+			 <div class="col-xs-10">
+			 	<label for"coords" class="control-label col">Coordinates</label> 
+	            <input id="coords" class="input-sm" type="text" name="coords" size="20" value="A3"></input> 
+	            <button id="firebtn" class="btn btn-primary" type="submit">Fire</button>
+	        </div>
+		</div>
+	</form>
+		<!--<p style="float: right"><%= session['gameid'] %> - Turn: Player <%= session['current_player_number'] + 1 %></p>-->
+
+	<div id="board" style="margin-left: 100px;">
 	</div>
 
 	<% if @error.nil? %>			
-		Game state: <%= session['gamestate'] %><br>
-		Current player number: <%= session['current_player_number'] + 1 %><br>
-		Game ID: <%= session['gameid'] %>
-
-		<br><b>Players Board</b>
+		
 		<script type="text/javascript">
 
 			var WIDTH = 1000;
@@ -21,34 +34,50 @@
 			var bgcolor = 0xffffff;
 			var stage = new PIXI.Stage(bgcolor);
 			var renderer = PIXI.autoDetectRenderer(WIDTH, HEIGHT);
-			document.body.appendChild(renderer.view);
+			board.appendChild(renderer.view);
 			var loader = new PIXI.AssetLoader(['tiles.json']);
+
+			var VERT = 0;
+			var HORZ = 1;
+			var WATER = 2;
+			var DESTROYED = 3;
 
 			var vert = isoTile('roadEW.png');
 			var horz = isoTile('roadNS.png');
 			var water = isoTile('water.png');
-			var tiles = [vert, horz, water];
+			var destroyed = isoTile('dirtDouble.png');
+			var tiles = [vert, horz, water, destroyed];
 
 			var tileWidth = 50;
 			var tileHeight = 50;
 
-			function drawMap(rowdata, size, xOffset, yOffset) {
+			function convert_to_letter(i) {
+
+				return String.fromCharCode(64 + i);
+			}
+
+			function drawMap(rowdata, rowsize, xOffset, yOffset) {
     
 			    var tileType, x, y, isoX, isoY, idx;
 
-			    console.log("Size " + size);
+			    console.log("rowsize " + rowsize);
 
+			    var textstart = 500;
 			    // Process rows first
-			    for (var i = 1, iL = size; i < iL; i++) {
+			    for (var i = 1; i < rowsize; i++) {
 			        
+			        var rowText = new PIXI.Text(convert_to_letter(i), { font: "32px Arial", fill: "gray"});
+			        rowText.position.x = textstart + (-i * 50);
+			        rowText.position.y = 0 + (i * 24);;
+					stage.addChild(rowText);
+
 			        var cols = rowdata[i];
-			        console.log(cols);
+			        console.log(cols);			     
 
 			        for (var j = 0, jL = cols.length; j < jL; j++) {
 
 			            x = j * tileWidth;
 			            y = i * tileHeight;
-
 
 			            // iso coordinate
 			            isoX = x - y;
@@ -60,21 +89,39 @@
                 			console.log("Tile type [" + tileType + "]");
 
                 			if (tileType == "V") {
-								drawTile = tiles[0];                				
+								drawTile = tiles[VERT];                				
 								drawTile(isoX + xOffset, isoY + yOffset);
                 			}
 
 							if (tileType == "H") {
-								drawTile = tiles[1];                				
+								drawTile = tiles[HORZ];                				
+								drawTile(isoX + xOffset, isoY + yOffset);
+                			}
+
+                			if (tileType == "D") {
+
+								drawTile = tiles[DESTROYED];                				
 								drawTile(isoX + xOffset, isoY + yOffset);
                 			}                			
 
 			            } else {
-			            	drawTile = tiles[2];                				
+			            	drawTile = tiles[WATER];                				
 							drawTile(isoX + xOffset, isoY + yOffset);
 			            }
 
 			         }
+			    }
+
+			    var xstart = -40;
+			    var ystart = 290;
+
+			    // Col numbers
+			    for (var i = 1; i < rowsize; i++) {
+
+			        var colHeaderText = new PIXI.Text(i, { font: "32px Arial", fill: "gray"});
+			        colHeaderText.position.x = xstart + (i * 45);
+			        colHeaderText.position.y = ystart + (i * 24);
+					stage.addChild(colHeaderText);
 			    }
 			}
 
@@ -82,16 +129,18 @@
 			function isoTile(filename) {
 
 				console.log("filename " + filename);
-			  return function(x, y) {
-			    var tile = PIXI.Sprite.fromFrame(filename);
-			    tile.position.x = x;
-			    tile.position.y = y;
 
-			    // bottom-left
-			    tile.anchor.x = 0;
-			    tile.anchor.y = 1;
-			    stage.addChild(tile);
-			  }
+				return function(x, y) {
+
+					var tile = PIXI.Sprite.fromFrame(filename);
+					tile.position.x = x;
+					tile.position.y = y;
+
+					// bottom-left
+					tile.anchor.x = 0;
+					tile.anchor.y = 1;
+					stage.addChild(tile);
+				}
 			}
 
 			$(document).ready(function() {
@@ -106,6 +155,7 @@
 						var size = board["size"] + 1;
 						var rowdata = board["rows"];
 
+						// Callback start() when the loader completes loading
 						loader.onComplete = start;
 						loader.load();
 
@@ -114,9 +164,10 @@
 						  drawMap(rowdata, size, WIDTH / 2, tileHeight * 1.5);
 
 						  function animate() {
-						    requestAnimFrame(animate);
-						    renderer.render(stage);
+						     //requestAnimFrame(animate);
+						     renderer.render(stage);
 						  }
+
 						  requestAnimFrame(animate);
 						}
 

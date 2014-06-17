@@ -23,7 +23,10 @@ class Player
 		@board = Board.new(config["board_height"], config["board_width"])		
 
 		@ships = load_ships(config)
-		board.layout(@ships)
+		ships_to_layout = @ships.dup
+		board.layout(ships_to_layout)
+
+		puts "Ships size #{@ships.size}"
 	end
 
 	def get_board()
@@ -51,6 +54,18 @@ class Player
 	def fire_shot(coords)
 
 		return @board.validate(coords)
+	end
+
+	def ship_destroyed(tile)
+
+		@ships.each do |s|
+			if s.is_sunk
+				return s
+			end
+		end
+		
+		# Yuck
+		return nil
 	end
 
 	def has_ships_that_are_intact

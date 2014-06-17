@@ -1,6 +1,6 @@
 class Ship
 
-	attr_accessor :name, :number, :size
+	attr_accessor :name, :number, :size, :tiles
 
 	def initialize(name, number, size)
 		@name = name
@@ -10,6 +10,9 @@ class Ship
 
 	def update(tiles, state)
 		
+		@tiles = tiles
+
+		# TODO: Should this be here?
 		tiles.each do |t|
 			t.state = state
 		end
@@ -18,12 +21,12 @@ class Ship
 	def is_sunk
 		
 		sunk = true
-		tiles.each do |t|
-			if t.state != DESTROYED
-				sunk = false
-				break
+		@tiles.each do |t|
+			if t.state != Tile::DESTROYED
+				return false
 			end
 		end
+		puts "Sunk #{sunk}"
 		return sunk
 	end
 
