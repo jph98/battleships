@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require "sinatra"
-require "sinatra/flash"
 require "json"
 
 require_relative "lib/game.rb"
@@ -147,7 +146,7 @@ get "/" do
 
     debug(id, server_games)
 
-    if !id.nil? and !server_games.include? id
+    if id.nil? and !server_games.include? id
 
         create_new_game(id, server_games)
 
@@ -155,7 +154,7 @@ get "/" do
 
     else
 
-        puts "\n\n* Found existing game for gameid #{id}"
+        puts "\n\n* Found existing game for gameid: #{id}"
         puts "Checking for #{id}"
         game = settings.server_games[id]
         puts "Found Game: #{game.id} in state #{game.state} for players: #{game.players.size()}"
