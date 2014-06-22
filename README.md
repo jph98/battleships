@@ -20,7 +20,6 @@ TODO
 ----
 
 * Change form POST to an AJAX post so we can register a callback and play the destroy sound
-* MAIN - Fix state where player destroys a tile already destroyed - should not register hit
 * MAIN - Game state end checking and the game over screen
 * MAIN - Display of players at top, e.g. human: jon, computer: dave
 * MAIN - Show board for opponent, also show players board
@@ -28,7 +27,7 @@ TODO
 * MAIN - Add tile states for start of ship and end of ship (HS, HM, HE), (VS, VM, VE)
 * MAIN - Add abandon game button/link
 
-* START - Start screen
+* START - Start screen - http://ezelia.com/2013/05/pixi-tutorial/
 * START - Select players at beginning of game - addition of human, start game button
 * START - Handle player placement of ships at beginning
 
@@ -60,3 +59,11 @@ Game Development Engines
 Full list - http://html5gameengine.com/
 
 Tile Editor - https://github.com/bjorn/tiled
+
+https://github.com/primus/primus
+
+Next
+----
+
+Phaser - http://phaser.io/
+Game.js - http://gamejs.org/showcase.html

@@ -32,9 +32,12 @@ def alternate_player(current_player_number)
 end
 
 def debug(id, server_games)
-    puts "Checking for id: #{id}"
-    server_games.each_pair do |i,g|
-        puts "Game: #{i}, #{g.state}"
+
+    unless id.nil?
+        puts "Checking for id: #{id}"
+        server_games.each_pair do |i,g|
+            puts "Game: #{i}, #{g.state}"
+        end
     end
 end
 
@@ -114,7 +117,10 @@ post "/attack" do
         tile = board.fire(coords)
         puts "Tile state is #{tile}"
 
-        if tile.state == Tile::H_OCCUPIED or tile.state == Tile::V_OCCUPIED
+        if tile.state == Tile::DESTROYED
+
+            @messages << "Missed, you hit a piece that was already destroyed"
+        elsif tile.state == Tile::H_OCCUPIED or tile.state == Tile::V_OCCUPIED
 
             tile.state = Tile::DESTROYED
             puts "Tile state #{tile.state}"
@@ -126,6 +132,7 @@ post "/attack" do
             else
                 @messages << "Player hit part of ship"
             end
+            
         else 
             @messages << "Missed"
         end
@@ -146,10 +153,9 @@ get "/" do
 
     debug(id, server_games)
 
-    if id.nil? and !server_games.include? id
+    if id.nil? or !server_games.include? id
 
         create_new_game(id, server_games)
-
         erb :battleships
 
     else

@@ -5,7 +5,7 @@
 	<div id="messages">
 		<% unless @messages.nil? %>
 			<% @messages.each do |m| %>
-				<p class="text-warning"><%= m %></p>
+				<p class="alert alert-danger"><%= m %></p>
 			<% end %>
 		<% end %>
 	</div>
