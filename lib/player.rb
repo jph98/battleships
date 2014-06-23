@@ -6,7 +6,7 @@ class Player
 	HUMAN = :HUMAN
 	COMPUTER = :COMPUTER
 
-	attr_accessor :name, :board
+	attr_accessor :name, :board, :ships
 
 	def initialize(name, type)
 

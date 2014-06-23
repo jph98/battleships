@@ -41,7 +41,6 @@ def debug(id, server_games)
     end
 end
 
-
 # Global error
 error do
   	e = request.env['sinatra.error']
@@ -79,6 +78,7 @@ def create_new_game(id, server_games)
     settings.server_games[game.id] = game
     puts "Added new game: #{game.id}, size: #{settings.server_games.size()}"
 
+    return game
 end
 
 ##################################################
@@ -87,15 +87,35 @@ end
 
 # Display list of accounts and count of logdetails
 
-get "/start" do
+def load_ships()
 
+    config = YAML::load(File.open("battleships.yml"))
+    puts "\nLoading ship configuration... total: #{config["ships"].size}"
+    ships = []
+
+    config["ships"].each_value do |s|
+        ship = Ship.new(s["name"], s["number"], s["size"])
+        ships << ship
+    end
+
+    return ships
+end
+
+post "/playersetup" do
+
+    params.keys.each do |k|    
+        puts "Key: #{k} value: #{params[k]}"
+    end
+    
     id = session['gameid']
-    server_games = settings.server_games
-    server_games[id] = nil  
+    server_games = settings.server_games()
+    puts "Place ships for player setup"
+    puts "\n\n* Found existing game for gameid: #{id}"
+    game = settings.server_games[id]
+    player_number = session["current_player_number"]
+    initialise_player_board(game, player_number)
 
-    create_new_game(id, server_games) 
-
-    erb :battleships
+    erb :main
 end
 
 post "/attack" do
@@ -143,20 +163,27 @@ post "/attack" do
 
     other_player.display_board()
 
-    erb :battleships
+    erb :main
 end
 
 get "/" do
 
-    id = session['gameid']
+    #id = session['gameid'
+    id = nil
     server_games = settings.server_games
 
     debug(id, server_games)
 
     if id.nil? or !server_games.include? id
 
-        create_new_game(id, server_games)
-        erb :battleships
+        game = create_new_game(id, server_games)
+
+        puts "Returning list of ships"
+        @ships = load_ships()
+        @ships.each do |s|
+            puts s.name
+        end
+        erb :start
 
     else
 
@@ -168,7 +195,7 @@ get "/" do
         player_number = session["current_player_number"]
         initialise_player_board(game, player_number)
 
-        erb :battleships
+        erb :main
     end
 end
 

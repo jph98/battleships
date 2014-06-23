@@ -1,0 +1,75 @@
+<div class="container"> 
+
+	<a href="/"><img src="logo.png"></a>
+
+	<div id="messages">
+		<% unless @messages.nil? %>
+			<% @messages.each do |m| %>
+				<p class="alert alert-danger"><%= m %></p>
+			<% end %>
+		<% end %>
+	</div>
+
+	<form action="/playersetup" method="post" class="well form-inline">
+
+		<div id="playersetup" class="control-group">
+
+			<% @ships.each do |s| %>
+				<div class="controls">
+				 	<label for"<%= s.name %>" class="input-small col-xs-2"><%= s.name %> (<%= s.size %>)</label>
+	            	<input id="coords" class="form-control" type="text" name="<%= s.name %>-coords" size="20" value="A3"></input> 
+		            <select name="<%= s.name %>-orientation" class="form-control">
+		            	<option value="<%= s.name %>-horizontal">horizontal</option>
+		            	<option value="<%= s.name %>-vertical">vertical</option>
+		            </select>
+		        </div>
+	        <% end %>
+
+	        <div class="control-group" style="margin-top: 10px">
+	        	<div class="controls center">
+	        		<button id="firebtn" class="btn btn-primary" type="submit">Place Ships</button>
+	        		<button id="firebtn" class="btn btn-secondary" type="submit">Clear Ships</button>
+	        		<button id="firebtn" class="btn btn-secondary" type="submit">Start Game</button>
+	        	</div>
+	        </div>
+		</div>
+	</form>
+		<!--<p style="float: right"><%= session['gameid'] %> - Turn: Player <%= session['current_player_number'] + 1 %></p>-->
+
+	<div id="board" style="margin-left: 100px; display: none;">
+	</div>
+	<div id="boardmsg" style="text-align: center; margin-top: 200px;">
+		<h1 id="playertext" >Place Your Ships...</h1> 
+	</div>
+
+	<% if @error.nil? %>			
+		
+		<script type="text/javascript" src="board.js"></script>
+
+		<script type="text/javascript">
+
+			$(document).ready(function() {
+
+				$(function () {				  
+
+					$("#playertext").textillate({ 
+				    	in: { effect: 'bounceIn', synx: false, delay: 50 }, 
+				    	minDisplayTime: 10000,
+				    	loop: false,
+				    	callback: function () {
+				    		displayboard();
+
+				    		// Randomise each of the initial positions and orientations based on 
+				    		// the initial board size.  Board should be all sea to start.
+
+				    		//$("#board").show();
+				    	}
+				    });
+				});
+			});
+
+		</script>
+
+	<% end %>
+
+</div>

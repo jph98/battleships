@@ -1,0 +1,57 @@
+<div class="container"> 
+
+	<a href="/"><img src="logo.png"></a>
+
+	<form action="/attack" method="post" class="well form-inline">
+		<div id="playercontrols" class="control-group">
+			 <div class="controls">
+			 	<label for"coords" class="control-label col">Coordinates</label> 
+	            <input id="coords" class="input-sm" type="text" name="coords" size="20" value="A3"></input> 
+	            <button id="firebtn" class="btn btn-primary" type="submit">Fire</button>
+	        </div>
+		</div>
+	</form>
+	<div id="messages">
+		<% unless @messages.nil? %>
+			<% @messages.each do |m| %>
+				<p class="alert alert-danger"><%= m %></p>
+			<% end %>
+		<% end %>
+	</div>
+		<!--<p style="float: right"><%= session['gameid'] %> - Turn: Player <%= session['current_player_number'] + 1 %></p>-->
+
+	<div id="board" style="margin-left: 100px; display: none;">
+	</div>
+	<div id="boardmsg" style="text-align: center; margin-top: 200px;">
+		<h1 id="playertext" >Player <%= session['current_player_number'] + 1 %></h1> 
+	</div>
+
+	<% if @error.nil? %>			
+		
+		<script type="text/javascript" src="board.js"></script>
+
+		<script type="text/javascript">
+
+			$(document).ready(function() {
+				    
+				// Only display this if we haven't taken a shot
+			    $("#playertext").textillate({ 
+			    	in: { effect: 'bounceIn', synx: false, delay: 0 }, 
+			    	out: { effect: 'rollOut', shuffle: false, sync: false, delay: 0 },
+			    	minDisplayTime: 10,
+			    	loop: false,
+			    	callback: function () {
+			    		console.log("Text effect complete, showing board");
+			    		loadexistingboard("<%= session['gameid'] %>", <%= session['current_player_number'] %>);
+			    		$("#board").show();
+			    		$("#playertext").hide();
+			    	}
+			    });
+
+			});
+
+		</script>
+
+	<% end %>
+
+</div>
